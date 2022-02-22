@@ -1,0 +1,119 @@
+{{> component_nav moreNavLinks=navLinks}}
+
+
+{{!-- <div class="content">
+    {{#if connections}}
+    <div class="card-columns">
+        {{#each allMySchemas}}
+        {{> connection_card connection=this}}
+        {{/each}}
+    </div>
+    {{else}}
+    {{> empty_list }}
+    {{/if}}
+</div> --}}
+<body>
+    <div id="issuing" class="tab" style="display:block;">
+        <div class="w3-container w3-card w3-padding w3-margin" style="float: left;width: 31%">
+            <h3>Create Schema: </h3>
+            <form id="schemaForm">
+                <label>Name of Schema: </label>
+                <input type="text" class="w3-input" name="schema_name" id="schema_name" value="VehicleKey">
+                <br><br>
+                <label>Schema Version: </label>
+                <input type="text" class="w3-input" name="schema_version" id="schema_version" value="1.0">
+                <br><br>
+                <label>Please supply a JSON of attributes:</label><br><br>
+                <textarea style="height:220px;" class="w3-input" name="attributes" id="attributes" required>["public_key":"4320fg943ifgkyju4535yrshasdv32h","vin":"ASFJ32IGI42S0FDJ23F32"]</textarea>
+                <br><br>
+                <input type="submit" class="btnSubmit" id="btnSubmit" >
+            </form>
+        </div>
+
+        <div style="float: left;width: 31%">
+            <div class="w3-container w3-card w3-padding w3-margin">
+                <h3>Create Credential Definition</h3>
+                <form method="POST" action="/api/issuer/create_cred_def">
+                    <label>Select a Schema:</label>
+                    <select class="w3-select" name="schema_id" required>
+                        <%for(let schema of schemas) {%>
+                        <option value="<%=schema.id%>"><%=schema.name%> <%=schema.version%></option>
+                        <%}%>
+                    </select>
+                    <br><br>
+                    <label>Tag:</label>
+                    <input class="w3-input" type="text" name="tag" value="MyTranscript" required>
+                    <br><br>
+                    <input class="w3-btn w3-white w3-border" type="submit">
+                </form>
+            </div>
+            <div class="w3-container w3-card w3-padding w3-margin">
+                <h3>Send Credential Offer</h3>
+                <form method="POST" action="/api/issuer/send_credential_offer">
+                    <label>Relationship: </label>
+                    <select class="w3-select" name="their_relationship_did" required>
+                        <%for(let relationship of relationships) {%>
+                            <option value="<%=relationship.their_did%>"><%=relationship.metadata.name%></option>
+                        <%}%>
+                    </select>
+                    <br><br>
+                    <label>Select a Credential Definition:</label>
+                    <select class="w3-select" name="cred_def_id" required>
+                        <%for(let credDef of credentialDefinitions) {%>
+                            <option value="<%=credDef.id%>"><%=credDef.tag%></option>
+                        <%}%>
+                    </select>
+                    <br><br>
+                    <input class="w3-btn w3-white w3-border" type="submit">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const schemaForm = document.getElementById('schemaForm');
+    var attributesData = document.getElementById('schemaForm').elements["attributes"].innerHTML;
+
+    schemaForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        function replacer(key)
+        {
+            if (key=="attributes") return attributesData;
+        }
+
+        //create formData variable
+        const formData = new FormData(this);
+
+        const schemaBody = {};
+
+        for(var pair of formData.entries()) {
+            if(pair[0] != "attributes") {
+                schemaBody[pair[0]] = pair[1];
+            } 
+            else {
+                schemaBody[pair[0]] = attributesData;
+                console.log(schemaBody.attributes);
+            }
+        }
+
+        //schemaBody["attributes"] = JSON.stringify(attributesData);
+        console.log(schemaBody);
+        console.log("***stringified***")
+        console.log(JSON.stringify(schemaBody));
+
+        fetch('http://localhost:8021/schemas', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(schemaBody)
+        }).then(function (response) {
+            return response.text();
+        }).then(function (text) {
+            console.log(text);
+        }).catch(function (error) {
+            console.error(error);
+        })
+    });
+
+    </script>
+</body>
