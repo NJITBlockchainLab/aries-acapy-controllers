@@ -12,7 +12,7 @@
     {{> empty_list }}
     {{/if}}
 </div> --}}
-<body>
+<body onload="javascript:getSchemasJson('http://localhost:8021/schemas/created')">
     <div id="issuing" class="tab" style="display:block;">
         <div class="w3-container w3-card w3-padding w3-margin" style="float: left;width: 31%">
             <h3>Create Schema: </h3>
@@ -23,8 +23,11 @@
                 <label>Schema Version: </label>
                 <input type="text" class="w3-input" name="schema_version" id="schema_version" value="1.0">
                 <br><br>
-                <label>Please supply a JSON of attributes:</label><br><br>
-                <textarea style="height:220px;" class="w3-input" name="attributes" id="attributes" required>["public_key":"4320fg943ifgkyju4535yrshasdv32h","vin":"ASFJ32IGI42S0FDJ23F32"]</textarea>
+                <label>Please supply a JSON array of attributes:</label><br><br>
+                <textarea style="height:220px;" class="w3-input" name="attributes" id="attributes" required>[
+                    "public_key":"4320fg943ifgkyju4535yrshasdv32h",
+                    "vin":"ASFJ32IGI42S0FDJ23F32"
+                ]</textarea>
                 <br><br>
                 <input type="submit" class="btnSubmit" id="btnSubmit" >
             </form>
@@ -33,12 +36,12 @@
         <div style="float: left;width: 31%">
             <div class="w3-container w3-card w3-padding w3-margin">
                 <h3>Create Credential Definition</h3>
-                <form method="POST" action="/api/issuer/create_cred_def">
+                <form method="POST" action="/credential-definitions">
                     <label>Select a Schema:</label>
                     <select class="w3-select" name="schema_id" required>
-                        <%for(let schema of schemas) {%>
-                        <option value="<%=schema.id%>"><%=schema.name%> <%=schema.version%></option>
-                        <%}%>
+                        {{#each schemasJson}}
+                        <option class="row"</option>
+                        {{/each}}
                     </select>
                     <br><br>
                     <label>Tag:</label>
@@ -72,18 +75,35 @@
 
     <script>
     const schemaForm = document.getElementById('schemaForm');
-    var attributesData = document.getElementById('schemaForm').elements["attributes"].innerHTML;
+    
+    //turn JSON array in form data into a usable Array for the API POST
+    function handleAttributes(formString,arrayString) {
+        var attributesData = document.getElementById(formString).elements[arrayString].innerHTML;
+        var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
+        handledArray = [];
+        for(let attr of attributesArray){
+            handledArray.push(attr);
+        }
+        return handledArray;
+    }
 
     schemaForm.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        function replacer(key)
-        {
-            if (key=="attributes") return attributesData;
-        }
-
         //create formData variable
         const formData = new FormData(this);
+
+        //handle the JSON array of attributes
+        function handleArrayInForm(form,arrayStringName) {
+            var attributesData = form.get(arrayStringName);
+            var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
+            handledArray = [];
+            for(let attr of attributesArray){
+                handledArray.push(attr);
+        }
+        return handledArray;
+    }
+        //attributesArray = formData.get('attributes');
 
         const schemaBody = {};
 
@@ -92,16 +112,11 @@
                 schemaBody[pair[0]] = pair[1];
             } 
             else {
-                schemaBody[pair[0]] = attributesData;
-                console.log(schemaBody.attributes);
+                schemaBody[pair[0]] = handleArrayInForm(formData,'attributes');
             }
         }
 
-        //schemaBody["attributes"] = JSON.stringify(attributesData);
-        console.log(schemaBody);
-        console.log("***stringified***")
-        console.log(JSON.stringify(schemaBody));
-
+        //POST the new schema to the ledger
         fetch('http://localhost:8021/schemas', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -115,5 +130,23 @@
         })
     });
 
+    
+    //fetch all schemas for schemas list
+    //function getSchemas() {
+    //var schemas;
+    //fetch('http://localhost:8021/schemas/created').then(function(response) {
+            //return response.json();
+        //}).then(function(myJson) {
+            //console.log(JSON.stringify(myJson));
+            //});
+    //}
+
+    async function getSchemasJson(url) {
+        let response = await fetch(url);
+        let data = await response.json()
+        return data;
+    }
+    var schemasJson = getSchemasJson('http://localhost:8021/schemas/created');
+    //console.log(schemasJson);
     </script>
 </body>
