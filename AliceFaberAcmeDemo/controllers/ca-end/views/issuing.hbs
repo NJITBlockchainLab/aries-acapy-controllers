@@ -12,7 +12,7 @@
     {{> empty_list }}
     {{/if}}
 </div> --}}
-<body onload="javascript:getSchemasJson('http://localhost:8021/schemas/created')">
+<body>
     <div id="issuing" class="tab" style="display:block;">
         <div class="w3-container w3-card w3-padding w3-margin" style="float: left;width: 31%">
             <h3>Create Schema: </h3>
@@ -25,8 +25,8 @@
                 <br><br>
                 <label>Please supply a JSON array of attributes:</label><br><br>
                 <textarea style="height:220px;" class="w3-input" name="attributes" id="attributes" required>[
-                    "public_key":"4320fg943ifgkyju4535yrshasdv32h",
-                    "vin":"ASFJ32IGI42S0FDJ23F32"
+                    "public_key",
+                    "vin"
                 ]</textarea>
                 <br><br>
                 <input type="submit" class="btnSubmit" id="btnSubmit" >
@@ -39,8 +39,8 @@
                 <form method="POST" action="/credential-definitions">
                     <label>Select a Schema:</label>
                     <select class="w3-select" name="schema_id" required>
-                        {{#each schemasJson}}
-                        <option class="row"</option>
+                        {{#each schemasJsonToVariable}}
+                        <option value="{{this}}"</option>
                         {{/each}}
                     </select>
                     <br><br>
@@ -132,21 +132,22 @@
 
     
     //fetch all schemas for schemas list
-    //function getSchemas() {
-    //var schemas;
-    //fetch('http://localhost:8021/schemas/created').then(function(response) {
-            //return response.json();
-        //}).then(function(myJson) {
-            //console.log(JSON.stringify(myJson));
-            //});
-    //}
+    const getSchemasJson = fetch('http://localhost:8021/schemas/created')
+    .then((response) => response.json())
+    .then((schema_ids) => {
+        return schema_ids["schema_ids"];
+    });
+   
+    //save the schemas to variable
+    const schemasJsonToVariable = async () => {
+        const a = await getSchemasJson;
+        console.log(a);
+    };
 
-    async function getSchemasJson(url) {
-        let response = await fetch(url);
-        let data = await response.json()
-        return data;
+    schemasJsonToVariable();
+    for(let i = 0; i < schemasJsonToVariable().length;i++ ){
+        console.log(schemasJsonToVariable()[i]);
     }
-    var schemasJson = getSchemasJson('http://localhost:8021/schemas/created');
-    //console.log(schemasJson);
+    //console.log(typeof(schemasJsonToVariable));
     </script>
 </body>
