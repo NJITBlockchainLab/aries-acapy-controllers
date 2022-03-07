@@ -3,7 +3,7 @@
 <head>
     <title>Issuing</title>
     </head>
-    <h1>Issue a Credential</h1>
+    <h1>Issuing</h1>
     <body>
         <div class="w3-container">
         <p>Create Schema</p>
@@ -28,31 +28,58 @@
         </div>
         <div class="w3-container">
         <p>Create Credential Definition</p>
-        <form action="/credential-definitions" method="POST">
+        <form id="cred_def_form">
             <div>
-            <label for="schemas">Schema ID:</label>
-            <select name="schemas" method="GET" action="/">
+            <label for="schema_id">Schema ID:</label>
+            <select id="schema_id" name="schema_id" method="GET" action="/">
                 {% for schema in schemas %}
                     <option value="{{schema}}" SELECTED>{{schema}}</option>
                 {% endfor %}
             </select>
             </div>
             <div>
-                <label for="connections">Recipient DID:</label>
-                <select name="connections" method="GET" action="/">
+                <label for="connection_id">Recipient DID:</label>
+                <select id="connection_id" name="connection_id" method="GET" action="/">
                     {% for connection, value in connections.items() %}
                         <option value="{{value}}" SELECTED>{{connection}}</option>
                     {% endfor %}
                 </select>
                 </div>
-            <button class="button execute" name="Submit" value="Submit">Submit</button>
+            <button class="submit" name="Submit" value="Submit">Submit</button>
         </form>
         </div>
+
+        <p>Issue Credential</p>
+        <form id="issue_cred_form">
+            <div>
+            <label for="cred_def_id">Credential Definition ID:</label>
+            <select id="cred_def_id" name="cred_def_id" method="GET" action="/">
+                {% for cred_def in credential_definitions %}
+                    <option value="{{cred_def}}" SELECTED>{{cred_def}}</option>
+                {% endfor %}
+            </select>
+            </div>
+            <div>
+                <label for="connection_id">Recipient DID:</label>
+                <select id="connection_id" name="connection_id" method="GET" action="/">
+                    {% for connection, value in connections.items() %}
+                        <option value="{{value}}" SELECTED>{{connection}}</option>
+                    {% endfor %}
+                </select>
+                </div>
+            <button class="submit" name="Submit" value="Submit">Submit</button>
+        </form>
+        </div>
+    
+    
+    
     </body>
     <script>
 
         const schemaForm = document.getElementById('schema_form');
-        
+        const credDefForm = document.getElementById('cred_def_form');
+        const issueCredForm = document.getElementById('issue_cred_form');
+
         //turn JSON array in form data into a usable Array for the API POST
         function handleAttributes(formString,arrayString) {
             var attributesData = document.getElementById(formString).elements[arrayString].innerHTML;
@@ -77,11 +104,10 @@
                 handledArray = [];
                 for(let attr of attributesArray){
                     handledArray.push(attr);
+                }
+                return handledArray;
             }
-            return handledArray;
-        }
-            //attributesArray = formData.get('attributes');
-    
+            
             const schemaBody = {};
     
             for(var pair of formData.entries()) {
@@ -92,7 +118,7 @@
                     schemaBody[pair[0]] = handleArrayInForm(formData,'attributes');
                 }
             }
-    
+            
             //POST the new schema to the ledger
             fetch('http://localhost:8021/schemas', {
                 method: 'POST',
@@ -106,6 +132,88 @@
                 console.error(error);
             })
         });
+
+        credDefForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+    
+            //create formData variable
+            const formData = new FormData(this);
+    
+            //handle the JSON array of attributes
+            function handleArrayInForm(form,arrayStringName) {
+                var attributesData = form.get(arrayStringName);
+                var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
+                handledArray = [];
+                for(let attr of attributesArray){
+                    handledArray.push(attr);
+            }
+            return handledArray;
+        }
+    
+            const credDefBody = {"revocation_registry_size": 1000,"support_revocation": false,"tag": "default"};
+    
+            //iterate through credential definition form entries
+            //add them to the credDefBody 
+            for(var pair of formData.entries()) {
+                credDefBody[pair[0]] = pair[1];
+            }
+    
+            //POST the new credential definition to the ledger
+            fetch('http://localhost:8021/credential-definitions', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(credDefBody)
+            }).then(function (response) {
+                return response.text();
+            }).then(function (text) {
+                console.log(text);
+            }).catch(function (error) {
+                console.error(error);
+            })
+        });
+
+
+        issueCredForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+    
+            //create formData variable
+            const formData = new FormData(this);
+    
+            //handle the JSON array of attributes
+            function handleArrayInForm(form,arrayStringName) {
+                var attributesData = form.get(arrayStringName);
+                var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
+                handledArray = [];
+                for(let attr of attributesArray){
+                    handledArray.push(attr);
+            }
+            return handledArray;
+        }
+    
+        var attributesVar = schemaBody["attributes"]
+
+            const credentialBody = {"auto_remove": true,"comment": "string","trace": false, "credential_proposal":{"attributes":attributesVar}};
+    
+            //iterate through credential definition form entries
+            //add them to the credentialBody 
+            for(var pair of formData.entries()) {
+                credentialBody[pair[0]] = pair[1];
+            }
+    
+            //POST the new credential definition to the ledger
+            fetch('http://localhost:8021/issue-credential/send', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(credentialBody)
+            }).then(function (response) {
+                return response.text();
+            }).then(function (text) {
+                console.log(text);
+            }).catch(function (error) {
+                console.error(error);
+            })
+        });
+    //console.log(schemaBody);
     </script>    
 
 </html>

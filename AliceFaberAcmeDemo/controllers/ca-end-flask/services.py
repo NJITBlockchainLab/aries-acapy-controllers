@@ -18,6 +18,12 @@ def get_schemas(URL,PARAMS):
     data = r.json()["schema_ids"]
     return data
 
+#get created credential definitions
+def get_credential_definitions(URL,PARAMS):
+    r = requests.get(url=URL, params=PARAMS)
+    data = r.json()["credential_definition_ids"]
+    return data
+
 #handle json
 def handle_json(URL,jsonObject):
     r = requests.post(url=URL,json=jsonObject)
