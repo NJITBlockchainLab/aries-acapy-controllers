@@ -12,6 +12,8 @@ const proofRouter = require('./routes/proof');
 const issuingRouter = require('./routes/issuing');
 const app = express();
 
+var indy = require('indy-sdk');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
@@ -56,8 +58,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-// app.get('/schemas/created', (request, response) => {
-//   response.json(createdSchemas);
-// });
 
 module.exports = app;

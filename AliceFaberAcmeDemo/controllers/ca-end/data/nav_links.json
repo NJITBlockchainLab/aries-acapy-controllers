@@ -13,6 +13,6 @@
     },
     {
         "label": "Issuing",
-        "url": "/issuing"
+        "url": "http://localhost:5000"
     }
 ]

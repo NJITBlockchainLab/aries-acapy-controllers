@@ -1,13 +1,15 @@
 #get list of schemas created
-
+import sys
 import requests
 
-URL = "http://localhost:8021/schemas/created"
+def getSchemas(url,params):
+    URL = url
+    PARAMS = params
+    r = requests.get(url=URL, params=PARAMS)
+    data = r.json()['schema_ids']
+    return data
 
-PARAMS = {}
-
-r = requests.get(url=URL, params=PARAMS)
-
-data = r.json()['schema_ids']
-
-print(data)
+if __name__ == '__main__':
+    var = getSchemas("http://localhost:8021/schemas/created",{})
+    print(var)
+    sys.stdout.flush()

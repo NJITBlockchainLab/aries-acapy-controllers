@@ -21,6 +21,10 @@ router.use(function (req, res, next) {
 });
 
 router.get('/', async function (req, res, next) {
+    res.redirect('/issuing');
+})
+
+router.get('/createdSchemas', async function (req, res, next) {
     const agentService = require('../services/AgentService');
     const allMySchemas = await agentService.getMyCreatedSchemas();
 
@@ -31,7 +35,6 @@ router.get('/', async function (req, res, next) {
         allMySchemas
     });
 });
-
 
 
 

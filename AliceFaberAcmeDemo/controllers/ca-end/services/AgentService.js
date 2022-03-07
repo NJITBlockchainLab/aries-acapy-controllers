@@ -1,4 +1,5 @@
 const http = require('http');
+const { response } = require('../app');
 
 const hostname = process.env.ACME_AGENT_HOST || 'localhost';
 const port = 8021;
@@ -180,7 +181,7 @@ class AgentService {
         } catch (error) {
             console.error(error);
         } finally {
-            return;
+            return response;
         }
     }
 

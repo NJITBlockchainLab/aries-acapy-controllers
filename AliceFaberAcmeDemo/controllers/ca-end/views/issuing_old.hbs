@@ -1,17 +1,5 @@
 {{> component_nav moreNavLinks=navLinks}}
 
-
-{{!-- <div class="content">
-    {{#if connections}}
-    <div class="card-columns">
-        {{#each allMySchemas}}
-        {{> connection_card connection=this}}
-        {{/each}}
-    </div>
-    {{else}}
-    {{> empty_list }}
-    {{/if}}
-</div> --}}
 <body>
     <div id="issuing" class="tab" style="display:block;">
         <div class="w3-container w3-card w3-padding w3-margin" style="float: left;width: 31%">
@@ -72,8 +60,8 @@
             </div>
         </div>
     </div>
-
     <script>
+
     const schemaForm = document.getElementById('schemaForm');
     
     //turn JSON array in form data into a usable Array for the API POST
@@ -132,33 +120,28 @@
 
     
     //fetch all schemas for schemas list
-    const getSchemasJson = fetch('http://localhost:8021/schemas/created')
-    .then((response) => response.json())
-    .then((schema_ids) => {
-        return schema_ids["schema_ids"];
-    });
+    //const getSchemasJson = fetch('http://localhost:8021/schemas/created')
+    //.then((response) => response.json())
+    //.then((schema_ids) => {
+    //    console.log(schema_ids["schema_ids"]);
+    //});
    
-    //save the schemas to variable
-    const schemasJsonToVariable = async () => {
-        const a = await getSchemasJson;
-        console.log(a);
-    };
-
-    //this function needs to be tested
-    (function () {
-    var old = console.log;
-    var logger = document.getElementById('log');
-    console.log = function (message) {
-        if (typeof message == 'object') {
-            logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : message) + '<br />';
-        } else {
-            logger.innerHTML += message + '<br />';
-        }
+    async function getSchemas(){
+        return fetch('http://localhost:8021/schemas/created',
+        {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => response.json())
+        .then((responseData) => {
+            //console.log(responseData);
+            return responseData;
+        })
+        .catch(error => console.warn(error));
     }
-    })();
-        
-    
-    
-    //console.log(typeof(schemasJsonToVariable));
+
     </script>
 </body>

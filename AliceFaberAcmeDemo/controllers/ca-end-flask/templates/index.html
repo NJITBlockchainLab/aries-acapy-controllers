@@ -7,7 +7,7 @@
     <body>
         <div class="w3-container">
         <p>Create Schema</p>
-        <form id="schemaForm" action="/create_schema" method="POST">
+        <form id="schema_form">
             <div>
                 <label for="schema_name">Schema Name: </label>
                 <input type="text" id="schema_name" name="schema_name"><br><br>
@@ -23,7 +23,7 @@
                 </textarea>
                 <br><br>
             </div>
-            <button class="button execute" name="Submit" value="Submit">Submit</button>
+            <button class="submit" name="Submit" value="Submit">Submit</button>
         </form>
         </div>
         <div class="w3-container">
@@ -49,5 +49,63 @@
         </form>
         </div>
     </body>
+    <script>
+
+        const schemaForm = document.getElementById('schema_form');
+        
+        //turn JSON array in form data into a usable Array for the API POST
+        function handleAttributes(formString,arrayString) {
+            var attributesData = document.getElementById(formString).elements[arrayString].innerHTML;
+            var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
+            handledArray = [];
+            for(let attr of attributesArray){
+                handledArray.push(attr);
+            }
+            return handledArray;
+        }
+    
+        schemaForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+    
+            //create formData variable
+            const formData = new FormData(this);
+    
+            //handle the JSON array of attributes
+            function handleArrayInForm(form,arrayStringName) {
+                var attributesData = form.get(arrayStringName);
+                var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
+                handledArray = [];
+                for(let attr of attributesArray){
+                    handledArray.push(attr);
+            }
+            return handledArray;
+        }
+            //attributesArray = formData.get('attributes');
+    
+            const schemaBody = {};
+    
+            for(var pair of formData.entries()) {
+                if(pair[0] != "attributes") {
+                    schemaBody[pair[0]] = pair[1];
+                } 
+                else {
+                    schemaBody[pair[0]] = handleArrayInForm(formData,'attributes');
+                }
+            }
+    
+            //POST the new schema to the ledger
+            fetch('http://localhost:8021/schemas', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(schemaBody)
+            }).then(function (response) {
+                return response.text();
+            }).then(function (text) {
+                console.log(text);
+            }).catch(function (error) {
+                console.error(error);
+            })
+        });
+    </script>    
 
 </html>
