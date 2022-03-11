@@ -49,7 +49,21 @@
         </form>
         </div>
 
-        <p>Issue Credential</p>
+        <p>Get DID's Verkey From Ledger</p>
+        <form id="get_verkey_form">
+            <div>
+                <label for="did">Recipient's Endpoint DID:</label>
+                <input type="text" id="did" name="did">
+                <!-- <select id="did" name="did">
+                    {% for connection, value in connections.items() %}
+                        <option value="{{connection}}" SELECTED>{{connection}}</option>
+                    {% endfor %}
+                </select> -->
+            </div>
+            <button class="submit" name="Submit" value="Submit">Submit</button>
+        </form>
+
+        <p>Issue Public Key Credential</p>
         <form id="issue_cred_form">
             <div>
             <label for="cred_def_id">Credential Definition ID:</label>
@@ -66,7 +80,17 @@
                         <option value="{{value}}" SELECTED>{{connection}}</option>
                     {% endfor %}
                 </select>
-                </div>
+            </div>
+            <label for="verkey">Recipient's Verkey:</label>
+            <input type="text" id="verkey" name="verkey">
+            <!-- <div>
+                <label for="connection_id">Recipient Verkey:</label>
+                <select id="connection_id" name="connection_id" onsubmit="document.write()">
+                    {% for connection in connections.items() %}
+                        <option value="{{connection}}" SELECTED>{{connection}}</option>
+                    {% endfor %}
+                </select>
+            </div> -->
             <button class="submit" name="Submit" value="Submit">Submit</button>
         </form>
         </div>
@@ -79,6 +103,7 @@
         const schemaForm = document.getElementById('schema_form');
         const credDefForm = document.getElementById('cred_def_form');
         const issueCredForm = document.getElementById('issue_cred_form');
+        const getVerkeyForm = document.getElementById('get_verkey_form');
 
         //turn JSON array in form data into a usable Array for the API POST
         function handleAttributes(formString,arrayString) {
@@ -103,7 +128,8 @@
                 var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
                 handledArray = [];
                 for(let attr of attributesArray){
-                    handledArray.push(attr);
+                    trimmedAttr = attr.trim();
+                    handledArray.push(trimmedAttr);
                 }
                 return handledArray;
             }
@@ -119,6 +145,8 @@
                 }
             }
             
+            console.log(schemaBody);
+
             //POST the new schema to the ledger
             fetch('http://localhost:8021/schemas', {
                 method: 'POST',
@@ -172,34 +200,97 @@
             })
         });
 
+        getVerkeyForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            let endpointDid = formData.get("did");
+            console.log(endpointDid);
+
+            fetch('http://localhost:8021/ledger/did-verkey?did=' + endpointDid, {
+                headers: {'Accept': 'application/json'}
+            }).then(function (response) {
+                return response.text();
+            }).then(function (text) {
+                window.alert(text);
+            }).catch(function (error) {
+                console.error(error);
+            })
+        });
+
 
         issueCredForm.addEventListener('submit', function(e) {
             e.preventDefault();
     
             //create formData variable
             const formData = new FormData(this);
+            let verkey = formData.get("verkey");
     
             //handle the JSON array of attributes
-            function handleArrayInForm(form,arrayStringName) {
-                var attributesData = form.get(arrayStringName);
-                var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
+            // function handleArrayInForm(form,arrayStringName) {
+            //     var attributesData = form.get(arrayStringName);
+            //     var attributesArray = attributesData.split("[").join("").split("]").join("").split("\n").join("").split(",");
+            //     handledArray = [];
+            //     for(let attr of attributesArray){
+            //         handledArray.push(attr);
+            // }
+            // return handledArray;
+            // }
+
+            function attributeStringToArray(inp) {
+                var attributes = inp;
+                var attributesArray = attributes.split("[").join("").split("]").join("").split("\n").join("").split(",");
                 handledArray = [];
                 for(let attr of attributesArray){
+                    attr = attr.trim();
                     handledArray.push(attr);
+                }
+                return handledArray;
             }
-            return handledArray;
-        }
-    
-        var attributesVar = schemaBody["attributes"]
 
-            const credentialBody = {"auto_remove": true,"comment": "string","trace": false, "credential_proposal":{"attributes":attributesVar}};
+            var attributesVar = {};
+            const schemaFormTemp = new FormData(schemaForm);
+            let schemaAttributes = schemaFormTemp.get('attributes');
+            schemaAttributes = attributeStringToArray(schemaAttributes)
+            //console.log(attributeStringToArray(schemaAttributes));
+            //console.log(typeof(attributeStringToArray(schemaAttributes)));
+            //get connection_id
+            let connection_id = formData.get('connection_id');
+
+            let credentialAttributes = [];
+            for(let attr of schemaAttributes){
+                let tempJson = {};
+                tempJson["name"] = attr;
+                tempJson["value"] = verkey;
+                credentialAttributes.push(tempJson);
+            }
+            
+            //check if valid Json String
+            function IsJsonString(str) {
+                try {
+                    str;
+                } catch (e) {
+                    return false;
+                }
+                    return true;
+            }
+            console.log(IsJsonString(schemaAttributes));
+
+            credentialAttributes = credentialAttributes;
+            
+            //console.log(credentialAttributes);
+
+            const credentialBody = {"auto_remove": true,"comment": "string","connection_id": connection_id,"trace": false, "credential_proposal":{"attributes":credentialAttributes}};
     
             //iterate through credential definition form entries
             //add them to the credentialBody 
-            for(var pair of formData.entries()) {
-                credentialBody[pair[0]] = pair[1];
-            }
-    
+            // for(var pair of formData.entries()) {
+            //     credentialBody[JSON.stringify(pair[0]] = pair[1];
+            // }
+
+            //console.log(credentialBody);
+
             //POST the new credential definition to the ledger
             fetch('http://localhost:8021/issue-credential/send', {
                 method: 'POST',
@@ -213,7 +304,6 @@
                 console.error(error);
             })
         });
-    //console.log(schemaBody);
     </script>    
 
 </html>

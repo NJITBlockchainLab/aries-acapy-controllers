@@ -9,7 +9,7 @@ const helpers = require('handlebars-helpers');
 const indexRouter = require('./routes/index');
 const connectionRouter = require('./routes/connection');
 const proofRouter = require('./routes/proof');
-const issuingRouter = require('./routes/issuing');
+//const issuingRouter = require('./routes/issuing');
 const app = express();
 
 var indy = require('indy-sdk');
@@ -26,7 +26,7 @@ app.engine('hbs', engine({
     path.join(__dirname, '/views/partials/connection'),
     path.join(__dirname, '/views/partials/home'),
     path.join(__dirname, '/views/partials/proof'),
-    path.join(__dirname, '/views/partials/issuing')
+    //path.join(__dirname, '/views/partials/issuing')
   ],
   helpers: helpers(['array', 'comparison'])
 }));
@@ -40,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/connections', connectionRouter);
 app.use('/proofs', proofRouter);
-app.use('/issuing', issuingRouter);
+//app.use('/issuing', issuingRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

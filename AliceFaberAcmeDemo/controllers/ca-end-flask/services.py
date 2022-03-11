@@ -24,8 +24,22 @@ def get_credential_definitions(URL,PARAMS):
     data = r.json()["credential_definition_ids"]
     return data
 
-#handle json
-def handle_json(URL,jsonObject):
-    r = requests.post(url=URL,json=jsonObject)
+#get DIDs of 
+
+#get users Verkeys
+def get_verkeys(URL,DID):
+    r = requests.get(url=URL,params=DID)
+    data = r.json()["verkey"]
+    return data
+
+#get json
+def get_json(URL,json_object):
+    r = requests.get(url=URL,json=json_object)
+    data = r.json()
+    return data
+
+#handle post json
+def handle_json(URL,json_object):
+    r = requests.post(url=URL,json=json_object)
     data = r.json()
     return data

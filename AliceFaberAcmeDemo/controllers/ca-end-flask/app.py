@@ -1,6 +1,6 @@
 import requests, json, asyncio
 from flask import Flask, flash, jsonify, request, redirect, url_for, render_template
-from services import get_connections, get_schemas, get_credential_definitions, handle_json
+from services import get_connections, get_schemas, get_credential_definitions, get_verkeys, handle_json
 app = Flask(__name__)
 app.secret_key = "abc"
 
@@ -19,6 +19,14 @@ def create_schema():
 	new_schema_json = jsonify(data)
 	handle_json("http://localhost:8021/schemas",new_schema_json)
 	return redirect(url_for("home"))
+
+# @app.route("/verkey",methods=["GET"])
+# def verkey():
+# 	data = request.form.get('get_verkey_form')
+# 	did_json = jsonify(data)
+# 	get_json("http://localhost:8021/ledger/did-verkey",did_json)
+# 	return redirect(url_for("home"))
+
 
 @app.route("/admin")
 def admin():
