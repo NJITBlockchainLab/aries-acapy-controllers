@@ -14,5 +14,13 @@
     {
         "label": "Issuing",
         "url": "http://localhost:5000"
+    },
+    {
+        "label": "Revocation",
+        "url": "/revocation"
+    },
+    {
+        "label": "Upload",
+        "url": "/upload"
     }
 ]
