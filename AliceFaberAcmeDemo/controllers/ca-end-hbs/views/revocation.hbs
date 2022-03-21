@@ -1,0 +1,118 @@
+{{> component_nav moreNavLinks=navLinks}}
+
+<!doctype html>
+<html>
+<head>
+<style>
+</style>
+    <title>Revocation</title>
+    </head>
+    <body>
+        <p>Create New CRL</p>
+        <form id="newCRLForm">
+            {{!-- <div>
+                <label for="fileName">CRL Name: </label>
+                <input type="text" name="fileName">
+                <br><br>
+                <label for="file">Upload CRL</label>
+                <input type="file" name="newFile">
+                <br></br>
+            </div> --}}
+            <div>
+                <label for="newCRL">Create New CRL:</label>
+                <br></br>
+                <textarea id="newCRL" name="newCRL" rows="15" cols="70">
+{
+  "@context": "https://w3id.org/openbadges/v2",
+  "id": "https://fhwa.org/credentialCAs/issuer1/revocationlist.json",
+  "type": "RevocationList",
+  "issuer": "https://fhwa.org/credentialCAs/issuer1.json",
+  "revokedAssertions":
+  [{
+      "id": "2f4a4cc35cdd1c534aeb82be4d03cc70271f2de56b4f1c4e948337665142603d",
+      "revocationReason": "Issued in error"
+    }]
+}
+                </textarea>
+                <br><br>
+            </div>
+            <button class="submit" value="Submit">Create CRL</button>
+        </form>
+        </div>
+
+        {{!-- <p>Get Existing CRL</p>
+        <form id="get_existing_crl">
+            <div>
+                <label for="existing_crl_name">CRL Name: </label>
+                <input type="text" id="existing_crl_name" name="existing_crl_name"><br></br>
+            </div>
+            <button class="submit" name="Submit2" value="Submit2">Get CRL</button>
+        </form> --}}
+
+        <div>
+
+        <p>Get DID's Verkey From Ledger</p>
+        <form id="get_verkey_form">
+            <div>
+                <label for="did">Recipient's Endpoint DID:</label>
+                <input type="text" id="did" name="did">
+                <!-- <select id="did" name="did">
+                    {% for connection, value in connections.items() %}
+                        <option value="{{connection}}" SELECTED>{{connection}}</option>
+                    {% endfor %}
+                </select> -->
+            </div>
+            <button class="submit" name="Submit" value="Submit">Submit</button>
+        </form>
+        </div>
+    <script>
+    //const newCRLForm = document.getElementById('newCRLForm');
+
+    //newCRLForm.addEventListener('submit', function(e) {
+            //e.preventDefault();
+    
+            ////create formData variable
+            //const formData = new FormData(this);
+    
+            ////for(let entry of formData.entries()) {
+                ////console.log(entry);
+            ////}
+
+            //let newCRLJson = formData.get('newCRL');
+
+            ////POST the new credential definition to the ledger
+            //fetch('https://infura.io:5001', {
+                //method: 'POST',
+                //body: JSON.stringify(newCRLJson)
+            //}).then(function (response) {
+                //return response.text();
+            //}).then(function (text) {
+                //console.log(text);
+            //}).catch(function (error) {
+                //console.error(error);
+            //})
+    //});
+
+    const newCRLForm = document.getElementById('newCRLForm');
+
+    newCRLForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        
+        newCRL = formData.get('newCRL');
+        //console.log(typeof(JSON.parse(newCRL)));
+        //data = {"test": "test"};
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: newCRL
+        };
+        //console.log(newCRL);
+
+        fetch('/revocation/upload', options);
+    });
+    </script>
+    </body>

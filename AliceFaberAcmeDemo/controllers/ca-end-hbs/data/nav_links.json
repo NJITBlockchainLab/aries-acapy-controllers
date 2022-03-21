@@ -1,0 +1,26 @@
+[
+    {
+        "label": "Connections",
+        "url": "/connections"
+    },
+    {
+        "label": "Proof Requests",
+        "url": "/proofs"
+    },
+    {
+        "label": "My Credentials",
+        "url": "/credentials"
+    },
+    {
+        "label": "Issuing",
+        "url": "http://localhost:5000"
+    },
+    {
+        "label": "Revocation",
+        "url": "/revocation"
+    },
+    {
+        "label": "Upload",
+        "url": "/upload"
+    }
+]
