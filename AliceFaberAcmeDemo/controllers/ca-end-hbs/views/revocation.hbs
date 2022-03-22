@@ -8,7 +8,7 @@
     <title>Revocation</title>
     </head>
     <body>
-        <p>Create New CRL</p>
+        <h1>Create New CRL</h1>
         <form id="newCRLForm">
             {{!-- <div>
                 <label for="fileName">CRL Name: </label>
@@ -19,7 +19,7 @@
                 <br></br>
             </div> --}}
             <div>
-                <label for="newCRL">Create New CRL:</label>
+                <label for="newCRL"></label>
                 <br></br>
                 <textarea id="newCRL" name="newCRL" rows="15" cols="70">
 {
@@ -28,10 +28,10 @@
   "type": "RevocationList",
   "issuer": "https://fhwa.org/credentialCAs/issuer1.json",
   "revokedAssertions":
-  [{
-      "id": "2f4a4cc35cdd1c534aeb82be4d03cc70271f2de56b4f1c4e948337665142603d",
+  {"2f4a4cc35cdd1c534aeb82be4d03cc70271f2de56b4f1c4e948337665142603d" : {
+      "cred_def_id": "example:CL:default:10",
       "revocationReason": "Issued in error"
-    }]
+    }}
 }
                 </textarea>
                 <br><br>
@@ -51,7 +51,7 @@
 
         <div>
 
-        <p>Get DID's Verkey From Ledger</p>
+        {{!-- <p>Get DID's Verkey From Ledger</p>
         <form id="get_verkey_form">
             <div>
                 <label for="did">Recipient's Endpoint DID:</label>
@@ -64,7 +64,7 @@
             </div>
             <button class="submit" name="Submit" value="Submit">Submit</button>
         </form>
-        </div>
+        </div> --}}
     <script>
     //const newCRLForm = document.getElementById('newCRLForm');
 
