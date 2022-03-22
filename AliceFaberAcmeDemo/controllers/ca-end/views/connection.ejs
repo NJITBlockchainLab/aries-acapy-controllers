@@ -1,0 +1,12 @@
+<% > component_nav moreNavLinks=navLinks %>
+<div class="content">
+    <% if (connections) {%>
+    <div class="card-columns">
+        <% for(let connection of connections) {%>
+        <%= > connection_card connection=this %>
+        <%}%>
+    </div>
+    <%} else { %>
+    <%= > empty_list %>
+    <% } %>
+</div>

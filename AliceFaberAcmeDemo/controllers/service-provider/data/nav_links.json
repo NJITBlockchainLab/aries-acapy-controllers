@@ -4,7 +4,7 @@
         "url": "/connections"
     },
     {
-        "label": "Proof Requests",
+        "label": "Verification",
         "url": "/proofs"
     }
 ]

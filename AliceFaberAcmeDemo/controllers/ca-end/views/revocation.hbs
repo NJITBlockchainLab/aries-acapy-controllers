@@ -9,15 +9,16 @@
     </head>
     <body>
         <p>Upload New CRL</p>
-        <form id="create_crl" action="/upload" method="POST" enctype="multipart/formdata">
+        <form action="/revocation/upload" method="POST" enctype="multipart/formdata">
             <div>
-                <label for="crl_name">CRL Name: </label>
-                <input type="text" id="fileName" name="fileName"><br><br>
-                <label>Upload CRL</label>
-                <input type="file" name=""file>
+                <label for="fileName">CRL Name: </label>
+                <input type="text" name="fileName">
+                <br><br>
+                <label for="file">Upload CRL</label>
+                <input type="file" name="file">
                 <br></br>
             </div>
-            <button class="submit" name="Submit" value="Submit">Submit</button>
+            <button class="submit" value="Submit">Submit</button>
         </form>
         </div>
 

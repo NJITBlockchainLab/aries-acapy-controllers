@@ -6,17 +6,17 @@
     <div class="collapse navbar-collapse justify-content-start navbar-collapse-markup">
         <div class="navbar-nav">
             <!-- Custom links go here -->
-            {{#each customNavLinks}}
-            <a class="nav-item nav-link {{this.class}}" href="{{this.url}}">{{this.label}}</a>
-            {{/each}}
+            <% for(let link of customNavLinks) {%>
+            <a class="nav-item nav-link <%=this.class%>" href="<%=this.url%>"><%=this.label%></a>
+            <%}%>
         </div>
     </div>
     <div class="collapse navbar-collapse justify-content-end navbar-collapse-markup">
         <div class="navbar-nav">
             <a class="nav-item nav-link" href="/">Home</a>
-            {{#each moreNavLinks}}
-            <a class="nav-item nav-link {{this.class}}" href="{{this.url}}">{{this.label}}</a>
-            {{/each}}
+            <% for(let link2 of moreNavLinks) {%>
+            <a class="nav-item nav-link <%=this.class%>" href="<%=this.url%>"><%=this.label%></a>
+            <%}%>
         </div>
     </div>
 </nav>

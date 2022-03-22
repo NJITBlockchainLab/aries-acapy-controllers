@@ -5,8 +5,8 @@ const { check, validationResult } = require('express-validator');
 const NavLinkService = require('../services/NavLinkService');
 const navLinkService = new NavLinkService();
 navLinkService.registerCustomLinks([
-    { "label": "Proofs", "url": "/proofs" },
-    { "label": "Request Proof", "url": "/proofs/request" }
+    // { "label": "Proofs", "url": "/proofs" },
+    // { "label": "Request Proof", "url": "/proofs/request" }
 ]);
 
 const proofJSON = {
