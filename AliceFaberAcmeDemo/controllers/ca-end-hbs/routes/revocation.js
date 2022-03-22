@@ -10,6 +10,9 @@ const bodyParser = require('body-parser');
 const multiparty = require('multiparty');
 const { create } = require('ipfs-http-client');
 const indy = require('indy-sdk');
+const utils = require("./utils");
+const os = require('os');
+const alert = require('alert');
 
 navLinkService.registerCustomLinks([
     // { "label": "Revocation", "url": "/revocation" },
@@ -18,6 +21,7 @@ navLinkService.registerCustomLinks([
 const fileUpload = require('express-fileupload');
 const fs = require('fs');
 const mv = require('mv');
+const { jar } = require('request');
 
 router.use(express.urlencoded({extended:true}));
 router.use(fileUpload());
@@ -66,82 +70,70 @@ let result = await ipfs.add({path: "crl.json",content:JSON.stringify(data)});
 console.log(result);
 }
 
-//saveFile();
+//get pool handle
+const poolName = 'sandbox';
+async function getPoolHandle(poolName){
+    //create pool ledger config
+    const genesisFilePath = "/home/nico/von-network/genesis/iiw_demo_genesis.txt"
+    const poolConfig = JSON.stringify({'genesis_txn': genesisFilePath})
+    await indy.createPoolLedgerConfig(poolName, null)
 
-// router.get('/', function(req,res) {
-//     res.render('revocation');
-// })
+    //get pool handle
+    const poolHandle = await indy.openPoolLedger(poolName,null);
+    console.log(poolHandle);
+}
+//getPoolHandle(poolName);
 
 
-// router.post('/upload', async function (req,res) {
-//     //return res.json({status: OK});
-//     var form = new multiparty.Form();
-//     console.log(form);
-//     console.log('test');
-    // const file = req.files.newFile;
-    // console.log(file);
-    // //const file = req.files.file;
-    // const fileName = req.body.fileName;
-    // const filePath = 'files/' + fileName;
-
-    // //upload file onto server
-    // //was file.mv
-    // await file.mv(filePath, async (err) => {
-    //     if (err) {
-    //     console.log('Error: failed to upload');
-    //     return res.status(500).send(err);
-    //     }
-
-    //     const fileHash = await addFile(fileName, filePath);
-    //     fs.unlink(filePath, (err) => {
-    //         if (err) console.log(err);
-    //     });
-    //     res.redirect('/revocation');
-    //     //console.log('fileName: '+ fileName);
-    //     //console.log('fileHash: '+ fileHash);
-    //     //res.render('/revocation', {fileName, fileHash});
-    // });
-    //res.render('/upload');
-//});
+//get wallet handle
+const walletName = {"id": "CAEnd"};
+const walletCredentials = {"key":"walletkey1"};
+async function getWalletHandle(walletName, walletCredentials){
+    const walletHandle = await indy.openWallet(walletName, walletCredentials);
+    //console.log(walletHandle);
+    return walletHandle;
+}
+//getWalletHandle(walletName, walletCredentials);
 
 router.post('/upload', (req,res) => {
     //req in JSON
     //console.log(req.body);
     
-    sendNewCRL = req.body;
+    sendNewCrl = req.body;
     //console.log(sendNewCRL);
 
-    async function uploadNewCRL(){
-        let ipfs = await ipfsClient();
-        
-        let result = await ipfs.add(JSON.stringify(sendNewCRL));
-        console.log(result);
-        return result;
+    const uploadNewCrl = async () => {
+        try
+        {
+            const ipfs = await ipfsClient();
+            const result = await ipfs.add(JSON.stringify(sendNewCrl));
+            //console.log(result);
+            alert(result["path"]);
+        } catch {
+            console.log("upload failed");
         }
+
+    };
+
     
-    let newCRLIpfsHash = uploadNewCRL();
-    console.log(newCRLIpfsHash);
+    async function getNewCrlHash(){
+        //var crlHash = await uploadNewCrl();
+        uploadNewCrl().then(data => {
+            return data;
+        }).catch(err => {
+            console.log(err);
+        })
+    };
+    newCRLIpfsHash = getNewCrlHash();
+    //console.log(newCRLIpfsHash);
 
     //need my DID to build transaction
 
-    //Open wallet and get handle from libindy
-    //const walletHandle = await indy.openWallet(walletName, walletCredentials)
+    // Open wallet and get handle from libindy
+    // const walletHandle = await indy.openWallet(walletName, walletCredentials)
 
-    //Building NYM request to add Trust Anchor to the ledger
-    //const attribRequest = buildAttribRequest ( 'W1nqK2fiZn3KUivUuVSQjA', 'W1nqK2fiZn3KUivUuVSQjA', {"CRL":newCRLIpfsHash});
-
-    //const nymRequest = await indy.buildNymRequest(/*submitter_did*/ stewardDid,
-        ///*target_did*/ trustAnchorDid,
-        ///*ver_key*/ trustAnchorVerkey,
-        ///*alias*/ undefined,
-        ///*role*/ 'TRUST_ANCHOR')
-
-    //Sending NYM request to the ledger
-    //await indy.signRequest();
-    //await indy.signAndSubmitRequest(/*pool_handle*/ poolHandle,
-        ///*wallet_handle*/ walletHandle,
-        ///*submitter_did*/ stewardDid,
-        ///*request_json*/ nymRequest)
+    // Building NYM request to add Trust Anchor to the ledger
+    // const attribRequest = buildAttribRequest ( 'W1nqK2fiZn3KUivUuVSQjA', 'W1nqK2fiZn3KUivUuVSQjA', {"CRL":newCRLIpfsHash});
 
 });
 

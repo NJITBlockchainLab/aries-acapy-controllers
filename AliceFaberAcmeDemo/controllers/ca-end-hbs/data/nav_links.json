@@ -18,9 +18,5 @@
     {
         "label": "Revocation",
         "url": "/revocation"
-    },
-    {
-        "label": "Upload",
-        "url": "/upload"
     }
 ]
