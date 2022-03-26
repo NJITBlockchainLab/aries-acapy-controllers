@@ -1,7 +1,7 @@
 {{> component_nav moreNavLinks=navLinks}}
 
-{{!-- <div class="content">
-    {{#if proofs}}
+<div class="content">
+    {{!-- {{#if proofs}}
     <div class="card-columns">
         {{#each proofs}}
         {{> proof_card proof=this}}
@@ -9,13 +9,30 @@
     </div>
     {{else}}
     {{> empty_list }}
-    {{/if}}
-</div> --}}
+    {{/if}} --}}
+</div>
 
 <!doctype> 
 <html>
+<head>
+<style>
+    h1{
+        font-family: "32px "Lucida Grande", Helvetica, Arial, sans-serif";  
+        font-size: 1rem;
+        color: rgb(68, 67, 67);
+        text-align: center;
+    }
+    textarea {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    div {
+        text-align:center;
+    }
+</style>
+</head>
     <body>
-        <h1>Verification: Check CRL</h1>
         <form id="checkCRLForm">
             {{!-- <div>
                 <label for="fileName">CRL Name: </label>
@@ -27,10 +44,10 @@
             </div> --}}
             <div>
                 <label for="crlHash">CRL Hash: </label>
-                <input type="text" id="crlHash" name="crlHash">
-                <label for="check"></label>
+                <input type="text" style="width: 500px;" id="crlHash" name="crlHash">
                 <br></br>
-                <textarea id="check" name="check" rows="8" cols="60">
+                <label for="check">Credential to Check (Supply JSON with CRED_DEF transaction hash digest and Credential Definition ID:</label>
+                <textarea id="check" name="check" rows="5" cols="80">
 {
     "id": "2f4a4cc35cdd1c534aeb82be4d03cc70271f2de56b4f1c4e948337665142603d",
     "cred_def_id": "example:CL:default:10"
@@ -38,7 +55,7 @@
                 </textarea>
                 <br><br>
             </div>
-            <button class="submit" value="Submit">Check CRL</button>
+            <button class="btn btn-primary btn-lg btn-block mb-3" value="Submit">Check CRL</button>
         </form>
     </body>
     <script>

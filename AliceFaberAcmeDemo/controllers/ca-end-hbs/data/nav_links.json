@@ -14,10 +14,5 @@
     {
         "label": "Verification",
         "url": "/proofs"
-    },
-    {
-        "label": "My Wallet",
-        "url": "/credentials"
     }
-
 ]
